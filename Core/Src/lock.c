@@ -3,6 +3,7 @@
 #include "keypad.h"
 #include "main.h"
 #include "gui.h"
+#include "pwm.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -84,6 +85,7 @@ static void lock_update_password(void)
 		lock_get_password();
 	} else {
 		GUI_locked();
+		PWM_SendClose();
 	}
 }
 
@@ -91,8 +93,10 @@ static void lock_open_lock(void)
 {
 	if (lock_validate_password() != 0) {
 		GUI_unlocked();
+		PWM_SendOpen();
 	} else {
 		GUI_locked();
+		PWM_SendClose();
 	}
 }
 
@@ -100,6 +104,7 @@ void lock_init(void)
 {
 	ring_buffer_init(&keypad_rb, keypad_buffer, 12);
 	GUI_init();
+	PWM_cont_Init();
 }
 
 void lock_sequence_handler(uint8_t key)
